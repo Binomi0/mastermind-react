@@ -26,5 +26,7 @@ export interface GameStore {
     movement: number;
   }) => void;
   setNewGameLevel: (newLevel: number) => void;
-  validateTurn: () => void;
+  handleValidate: (callback: (score?: number) => void) => void;
+  resetGame: () => void;
+  setUserSelectedMovement: (movement: number, activeColumn: number) => void;
 }

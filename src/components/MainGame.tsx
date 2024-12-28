@@ -1,10 +1,19 @@
+import { useCallback, useEffect, useRef } from "react";
 import { enqueueSnackbar } from "notistack";
 import useGameStore from "../store/gameStore";
 import { isEnterKeyPressed, isValidKey } from "../utils/handlers";
-import { useCallback, useEffect, useRef } from "react";
+import GameFinish from "./GameFinish";
+import Header from "./Header";
+import Validations from "./Validations";
+import TableroJuego from "./TableroJuego";
+import Selectables from "./Selectables";
+import usePlayerStore from "../store/playerStore";
+import "../styles/main-game.scss";
 
 const MainGame = () => {
   const {
+    gameWin,
+    gameLost,
     availableColors,
     timeElapsed,
     setNewTurn,
@@ -12,7 +21,9 @@ const MainGame = () => {
     activeColumn,
     movement,
     itemColors,
+    handleValidate,
   } = useGameStore();
+  const { playerName } = usePlayerStore();
   const gameTimer = useRef<NodeJS.Timer>(undefined);
 
   const setGameTimer = useCallback(() => {
@@ -52,7 +63,34 @@ const MainGame = () => {
     [activeColumn, itemColors, movement, setGameTimer, setNewTurn, timeElapsed]
   );
 
-  const handleValidate = () => {};
+  const handleValidateTurn = useCallback(() => {
+    handleValidate((_score) => {
+      clearInterval(gameTimer.current);
+
+      if (_score) {
+        console.log("Has conseguido", _score, " puntos.");
+
+        const records = localStorage.getItem("records");
+
+        if (!records) {
+          localStorage.setItem(
+            "records",
+            JSON.stringify([
+              { score: _score, time: timeElapsed, player: playerName },
+            ])
+          );
+        } else {
+          const recordsJSON = JSON.parse(records);
+          recordsJSON.push({
+            score: _score,
+            time: timeElapsed,
+            player: playerName,
+          });
+          localStorage.setItem("records", JSON.stringify(recordsJSON));
+        }
+      }
+    });
+  }, [handleValidate, playerName, timeElapsed]);
 
   const setKeyListeners = useCallback(
     (e: KeyboardEvent) => {
@@ -62,25 +100,53 @@ const MainGame = () => {
             handleSetMovement(availableColors[Number(e.key) - 1]);
           }
           if (isEnterKeyPressed(e.key)) {
-            handleValidate();
+            handleValidateTurn();
           }
         }
         return e.key;
       }
     },
-    [availableColors, handleSetMovement]
+    [availableColors, handleSetMovement, handleValidateTurn]
   );
 
   useEffect(() => {
     document.addEventListener("keydown", setKeyListeners);
 
-    enqueueSnackbar("Cuando estés listo, puedes comenzar");
     return () => {
       document.removeEventListener("keydown", setKeyListeners);
     };
   }, [availableColors, setKeyListeners]);
 
-  return <div />;
+  useEffect(() => {
+    enqueueSnackbar("Cuando estés listo, puedes comenzar");
+  }, []);
+
+  console.log({ gameWin, gameLost }, gameWin || gameLost);
+
+  return (
+    <div className="tablero">
+      {gameWin || gameLost ? (
+        <GameFinish ref={gameTimer} />
+      ) : (
+        <>
+          <Header />
+          <div className="game-container">
+            <Validations />
+            <TableroJuego />
+          </div>
+          <Selectables
+            handleSetMovement={handleSetMovement}
+            handleValidateTurn={handleValidateTurn}
+          />
+          <p>
+            Puedes usar los números (1,2,3...) para seleccionar un color y
+            (Enter) para validar la jugada.
+          </p>
+        </>
+      )}
+      {/* {hasError && <h1>Mierda un ojet!</h1>} */}
+    </div>
+  );
 };
 
 export default MainGame;

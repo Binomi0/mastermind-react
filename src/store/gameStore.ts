@@ -14,7 +14,7 @@ import { enqueueSnackbar } from "notistack";
 
 const MAX_COLUMNS = 11;
 
-const useGameStore = create<GameStore>((set, get) => ({
+const initialState = {
   activeColumn: 1,
   availableColors: [],
   gameStarted: false,
@@ -34,6 +34,10 @@ const useGameStore = create<GameStore>((set, get) => ({
     name: "",
     bonus: 0,
   },
+};
+
+const useGameStore = create<GameStore>((set, get) => ({
+  ...initialState,
   startGame: () =>
     set((state) => ({
       ...state,
@@ -97,7 +101,7 @@ const useGameStore = create<GameStore>((set, get) => ({
           };
       }
     }),
-  validateTurn: () => {
+  handleValidate: (callback: (score?: number) => void) => {
     const {
       result,
       activeColumn,
@@ -127,15 +131,28 @@ const useGameStore = create<GameStore>((set, get) => ({
 
       const score = timeBonus * finishColumn + gameLevel.bonus;
 
-      return set({
+      set({
         score,
         gameWin: true,
       });
+      callback(score);
+      return;
     }
 
     // Last column was filled so game over
     if (activeColumn === 10) {
-      return set({ gameLost: true });
+      set({
+        score: 0,
+        activeColumn: initialState.activeColumn,
+        result: initialState.result,
+        selectedColor: initialState.selectedColor,
+        movement: initialState.movement,
+        gameLevel: initialState.gameLevel,
+        gameWin: false,
+        gameLost: true,
+      });
+      callback();
+      return;
     }
 
     set({
@@ -150,6 +167,12 @@ const useGameStore = create<GameStore>((set, get) => ({
     const position = gameFinish.length;
     const colores = match.length;
     enqueueSnackbar(`Has acertado ${position} posición y ${colores} colores`);
+  },
+  resetGame: () => {
+    set(initialState);
+  },
+  setUserSelectedMovement: (movement: number, activeColumn: number) => {
+    set({ movement, activeColumn });
   },
 }));
 

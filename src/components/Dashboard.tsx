@@ -2,6 +2,7 @@ import useGameStore from "../store/gameStore";
 import usePlayerStore from "../store/playerStore";
 import { ChangeEvent, useState } from "react";
 import MainGame from "./MainGame";
+import Records from "./Records";
 
 const Dashboard = () => {
   const [showRecords, setShowRecords] = useState(false);
@@ -18,6 +19,7 @@ const Dashboard = () => {
     if (!isNaN(newLevel)) {
       setLevel(newLevel);
       setNewGameLevel(newLevel);
+      startGame();
     }
   }
 
@@ -28,11 +30,7 @@ const Dashboard = () => {
         {filled && (
           <div>
             <h3>Bienvenido {playerName}</h3>
-            {level ? (
-              <button className="new-game-button" onClick={startGame}>
-                Nueva Partida
-              </button>
-            ) : (
+            {!level && (
               <select onChange={handleSelectLevel}>
                 <option value={undefined}>Elige un nivel</option>
                 <option value={5}>5 - Fácil</option>
@@ -50,7 +48,7 @@ const Dashboard = () => {
             >
               Records
             </button>
-            {/* {showRecords && <Records />} */}
+            {showRecords && <Records />}
           </div>
         )}
         <div className="form">
