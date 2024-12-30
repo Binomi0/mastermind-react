@@ -8,11 +8,7 @@ interface Props {
 }
 
 const Ficha = ({ isColumnActive, itemIndex, column }: Props) => {
-  const { movement, itemColors, setUserSelectedMovement } = useGameStore();
-
-  const handleClick = () => {
-    setUserSelectedMovement(itemIndex, column);
-  };
+  const { movement, itemColors } = useGameStore();
 
   const active = itemIndex <= movement && isColumnActive;
 

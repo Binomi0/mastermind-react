@@ -1,4 +1,4 @@
-import { Ref, RefObject, useCallback, useEffect, useState } from "react";
+import { RefObject, useCallback, useEffect, useState } from "react";
 import Confetti from "react-dom-confetti";
 import useGameStore from "../store/gameStore";
 import usePlayerStore from "../store/playerStore";
