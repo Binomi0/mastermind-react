@@ -10,6 +10,7 @@
     "@types/node": "^16.7.13",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
+    "firebase-tools": "^13.29.1",
     "notistack": "^3.0.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -24,6 +25,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "firebase": "firebase",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
