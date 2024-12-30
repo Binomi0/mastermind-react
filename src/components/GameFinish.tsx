@@ -23,7 +23,6 @@ interface Props {
 }
 
 const GameFinish = ({ ref }: Props) => {
-  console.log("GAME FINISH");
   const [showConfetti, setShowConfetti] = useState(false);
   const { playerName } = usePlayerStore();
   const { activeColumn, gameWin, gameLost, timeElapsed, score, resetGame } =
@@ -33,7 +32,6 @@ const GameFinish = ({ ref }: Props) => {
   const handleResetGame = useCallback(() => {
     resetGame();
     setLevel(0);
-    console.log(ref.current);
     clearInterval(ref.current);
   }, [ref, resetGame, setLevel]);
 

@@ -29,4 +29,11 @@ export interface GameStore {
   handleValidate: (callback: (score?: number) => void) => void;
   resetGame: () => void;
   setUserSelectedMovement: (movement: number, activeColumn: number) => void;
+  goBackMovement: () => void;
+}
+
+export interface GameRecord {
+  score: number;
+  time: number;
+  player: string;
 }

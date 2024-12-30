@@ -174,6 +174,42 @@ const useGameStore = create<GameStore>((set, get) => ({
   setUserSelectedMovement: (movement: number, activeColumn: number) => {
     set({ movement, activeColumn });
   },
+  goBackMovement: () => {
+    const { movement, itemColors, activeColumn } = get();
+    if (movement / activeColumn > 4) {
+      set({
+        movement: movement - 1,
+        selectedColor: "",
+        itemColors: {
+          ...itemColors,
+          [activeColumn]: {
+            ...itemColors[activeColumn],
+            [movement - 1]: "",
+          },
+        },
+      });
+    } else if ([1, 5, 9, 13, 17, 21, 25, 29, 33, 37].includes(movement)) {
+      set({
+        itemColors: {
+          ...itemColors,
+          [activeColumn]: { ...itemColors[activeColumn], [movement]: "" },
+        },
+      });
+    } else {
+      set({
+        movement: movement - 1,
+        selectedColor: "",
+        itemColors: {
+          ...itemColors,
+          [activeColumn]: {
+            ...itemColors[activeColumn],
+            [movement - 1]: "",
+            [movement]: "",
+          },
+        },
+      });
+    }
+  },
 }));
 
 export default useGameStore;

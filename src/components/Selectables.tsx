@@ -10,7 +10,6 @@ interface Props {
 const Selectables = ({ handleSetMovement, handleValidateTurn }: Props) => {
   const { turnFilled, availableColors } = useGameStore();
 
-  console.log({ turnFilled });
   return (
     <div className="seleccionable">
       <div className="fichas">

@@ -3,6 +3,7 @@ import usePlayerStore from "../store/playerStore";
 import { ChangeEvent, useState } from "react";
 import MainGame from "./MainGame";
 import Records from "./Records";
+import "../styles/dashboard.scss";
 
 const Dashboard = () => {
   const [showRecords, setShowRecords] = useState(false);
@@ -31,8 +32,8 @@ const Dashboard = () => {
           <div>
             <h3>Bienvenido {playerName}</h3>
             {!level && (
-              <select onChange={handleSelectLevel}>
-                <option value={undefined}>Elige un nivel</option>
+              <select autoFocus className="select" onChange={handleSelectLevel}>
+                <option value={undefined}>Elige un nivel para empezar</option>
                 <option value={5}>5 - Fácil</option>
                 <option value={6}>6 - Intermedio</option>
                 <option value={7}>7 - Difícil</option>
@@ -44,9 +45,9 @@ const Dashboard = () => {
 
             <button
               className="new-game-button"
-              onClick={() => setShowRecords(true)}
+              onClick={() => setShowRecords((s) => !s)}
             >
-              Records
+              {showRecords ? "Hide " : "Show "}Records
             </button>
             {showRecords && <Records />}
           </div>
@@ -55,8 +56,10 @@ const Dashboard = () => {
           {!filled && (
             <form action={changeName}>
               <label>Introduce tu nombre</label>
-              <input name="playerName" required />
-              <button type="submit">Enviar</button>
+              <input autoFocus name="playerName" required />
+              <button className="new-game-button" type="submit">
+                Enviar
+              </button>
             </form>
           )}
         </div>

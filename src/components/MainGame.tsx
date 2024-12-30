@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef } from "react";
+import { useCallback, useEffect } from "react";
 import { enqueueSnackbar } from "notistack";
 import useGameStore from "../store/gameStore";
 import { isEnterKeyPressed, isValidKey } from "../utils/handlers";
@@ -9,6 +9,9 @@ import TableroJuego from "./TableroJuego";
 import Selectables from "./Selectables";
 import usePlayerStore from "../store/playerStore";
 import "../styles/main-game.scss";
+import useGameTimer from "../hooks/useGameTimer";
+import { GameRecord } from "../store/types";
+import { sortRecords } from "../utils/helpers";
 
 const MainGame = () => {
   const {
@@ -17,34 +20,19 @@ const MainGame = () => {
     availableColors,
     timeElapsed,
     setNewTurn,
-    setTimeElapsed,
     activeColumn,
     movement,
     itemColors,
     handleValidate,
+    goBackMovement,
   } = useGameStore();
   const { playerName } = usePlayerStore();
-  const gameTimer = useRef<NodeJS.Timer>(undefined);
-
-  const setGameTimer = useCallback(() => {
-    let timer = 0;
-    if (!gameTimer.current) {
-      gameTimer.current = setInterval(() => {
-        timer += 1;
-        setTimeElapsed(timer);
-      }, 1000);
-    }
-  }, [setTimeElapsed]);
+  const { setGameTimer, gameTimer } = useGameTimer();
 
   const handleSetMovement = useCallback(
     (color: string) => {
-      if (timeElapsed === 0) {
-        setGameTimer();
-      }
-
-      if (movement / activeColumn > 4) {
-        return;
-      }
+      if (timeElapsed === 0) setGameTimer();
+      if (movement / activeColumn > 4) return;
 
       const newTurn = {
         selectedColor: color,
@@ -68,8 +56,6 @@ const MainGame = () => {
       clearInterval(gameTimer.current);
 
       if (_score) {
-        console.log("Has conseguido", _score, " puntos.");
-
         const records = localStorage.getItem("records");
 
         if (!records) {
@@ -80,17 +66,20 @@ const MainGame = () => {
             ])
           );
         } else {
-          const recordsJSON = JSON.parse(records);
+          const recordsJSON: GameRecord[] = JSON.parse(records);
           recordsJSON.push({
             score: _score,
             time: timeElapsed,
             player: playerName,
           });
-          localStorage.setItem("records", JSON.stringify(recordsJSON));
+          localStorage.setItem(
+            "records",
+            JSON.stringify(recordsJSON.sort(sortRecords))
+          );
         }
       }
     });
-  }, [handleValidate, playerName, timeElapsed]);
+  }, [gameTimer, handleValidate, playerName, timeElapsed]);
 
   const setKeyListeners = useCallback(
     (e: KeyboardEvent) => {
@@ -104,9 +93,11 @@ const MainGame = () => {
           }
         }
         return e.key;
+      } else if (e.key === "Backspace") {
+        goBackMovement();
       }
     },
-    [availableColors, handleSetMovement, handleValidateTurn]
+    [availableColors, goBackMovement, handleSetMovement, handleValidateTurn]
   );
 
   useEffect(() => {
@@ -120,8 +111,6 @@ const MainGame = () => {
   useEffect(() => {
     enqueueSnackbar("Cuando estés listo, puedes comenzar");
   }, []);
-
-  console.log({ gameWin, gameLost }, gameWin || gameLost);
 
   return (
     <div className="tablero">
@@ -144,7 +133,6 @@ const MainGame = () => {
           </p>
         </>
       )}
-      {/* {hasError && <h1>Mierda un ojet!</h1>} */}
     </div>
   );
 };

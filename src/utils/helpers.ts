@@ -1,3 +1,5 @@
+import { GameRecord } from "../store/types";
+
 const TOTAL_COLUMNS = 10;
 const ROWS = 4;
 
@@ -41,3 +43,5 @@ export function shuffle(array: string[]) {
 
   return array;
 }
+
+export const sortRecords = (a: GameRecord, b: GameRecord) => b.score - a.score;

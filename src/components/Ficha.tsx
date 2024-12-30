@@ -18,7 +18,7 @@ const Ficha = ({ isColumnActive, itemIndex, column }: Props) => {
 
   return (
     <div
-      onClick={handleClick}
+      // onClick={handleClick}
       className={`ficha ficha-${itemIndex} column-${column}${
         active ? " active" : ""
       }`}
